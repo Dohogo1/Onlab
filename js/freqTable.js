@@ -1,11 +1,21 @@
 export function buildTable(text) {
-    const tableData = {};
+    if (!text) {
+        return [];
+    }
+    const counts = new Map();
     for (const char of text) {
-        tableData[char] = [(tableData[char]?.[0] || 0) + 1, null];
+        counts.set(char, (counts.get(char) || 0) + 1);
     }
-    for (const char of Object.keys(tableData)) {
-        tableData[char][1] = (tableData[char][0] / text.length);
-    }
+    const tableData = Array.from(counts, ([char, count]) => {
+        return {
+            char: char,
+            count: count,
+            freq: count / text.length
+        };
+    });
+
+    tableData.sort((a, b) => b.count - a.count);
+    
     return tableData;
 }
 
@@ -19,20 +29,26 @@ export function createTable(table) {
         th.textContent = text;
         headerRow.appendChild(th);
     });
+
     tableElement.appendChild(headerRow);
-    const data = Object.entries(table).map(([char, [count, freq]]) => ({
-        Character: char,
-        Count: count,
-        Frequency: freq.toFixed(4)
-    }));
-    data.forEach(item => {
+
+    for(const {char, count, freq} of table) {
         const row = document.createElement("tr");
-        Object.values(item).forEach(value => {
-            const cell = document.createElement("td");
-            cell.textContent = value;
-            row.appendChild(cell);
-        });
+
+        const charCell = document.createElement("td");
+        charCell.textContent = `'${char}'`;
+        row.appendChild(charCell); 
+
+        const countCell = document.createElement("td");
+        countCell.textContent = count;
+        row.appendChild(countCell);
+
+        const freqCell = document.createElement("td");
+        freqCell.textContent = freq.toFixed(4);
+        row.appendChild(freqCell);
+
         tableElement.appendChild(row);
-    });
+    }
+
     return tableElement;
 }
