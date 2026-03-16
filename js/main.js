@@ -1,5 +1,6 @@
 import * as freqTable from "./freqTable.js";
 import { renderTree } from './treeRenderer.js';
+import StaticHuffman from "./encoders/staticHuffman.js";
 
 let freqTableData = null;
 let isTableCreated = false;
@@ -17,18 +18,38 @@ document.getElementById("startButton").addEventListener("click", () => {
     isTableCreated = true;
     
     console.log(freqTableData, isTableCreated);
-});
 
+    // --- Huffman Tree Logic ---
+    // 1. StaticHuffman expects an object/dictionary, so we convert the array:
+    const huffmanInputObj = {};
+    freqTableData.forEach(item => {
+        huffmanInputObj[item.char] = item.freq;
+    });
+
+    // 2. Instantiate and build the tree
+    const huffman = new StaticHuffman(huffmanInputObj);
+    huffman.build();
+
+    // 3. Render the first solution found
+    if (huffman.solutions.length > 0) {
+        const generatedTreeRoot = huffman.solutions[0].root;
+        renderTree(generatedTreeRoot);
+    } else {
+        console.error("No tree solutions were generated.");
+    }
+});
+/*
 // Example dummy data testing the renderer
 const dummyTree = {
-    count: 10,
-    right: { char: 'a', count: 4 },
+    freq: 1,
+    right: { char: 'a', freq: 0.6000 },
     left: { 
-        count: 6,
-        left: { char: 'b', count: 3 },
-        right: { char: 'c', count: 3 }
+        freq: 0.4000,
+        left: { char: 'b', freq: 0.12500 },
+        right: { char: 'c', freq: 0.275000 }
     }
 };
 
 // Call the renderer
 renderTree(dummyTree);
+*/

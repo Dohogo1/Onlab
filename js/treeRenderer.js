@@ -24,6 +24,10 @@ export function renderTree(rootNode) {
         return children.length > 0 ? children : null;
     });
 
+    // NEW: Sort the tree so the smaller frequencies always go to the left
+    root.sort((a, b) => b.data.freq - a.data.freq);
+
+
     // 4. Map the hierarchy to a tree layout
     const treeLayout = d3.tree().size([
         width - margin.left - margin.right, 
@@ -67,6 +71,8 @@ export function renderTree(rootNode) {
         .style("font-weight", "bold")
         .style("fill", "#666");
 
+    const formatFreq = d3.format(".4~f");
+
     // 6. Draw the nodes (Circles + Text)
     const node = svg.selectAll(".node")
         .data(root.descendants())
@@ -76,27 +82,28 @@ export function renderTree(rootNode) {
 
     // Add circles
     node.append("circle")
-        .attr("r", 15)
+        .attr("r", 20)
         .attr("fill", "#fff")
-        .attr("stroke", "steelblue")
+        // Check for children: if none (!d.children), it's a leaf! Make it green.
+        .attr("stroke", d => !d.children ? "#90fc99" : "lightblue") 
         .attr("stroke-width", 3);
 
     node.append("text")
         .attr("dy", "0.31em")
         .attr("text-anchor", "middle")
-        .text(d => d.data.count || "") 
+        .text(d => d.data.freq != null ? formatFreq(d.data.freq) : "")
         .style("font-size", "12px")
         .style("font-weight", "bold");
 
-    // Add text (Assuming your node has 'char' or 'count' properties)
+    // Add text 
     node.filter(d => !d.children) // Only target leaves
         .append("text")
-        .attr("dy", "2.2em") // Push it below the circle
+        .attr("dy", "2.8em") // Push it below the circle
         .attr("text-anchor", "middle")
         .text(d => {
             if (d.data.char === " ") return "' ' (Spc)";
             if (d.data.char === "\n") return "'\\n'";
-            return `'${d.data.char}'`; // Wrap the character in quotes for clarity
+            return `${d.data.char}`; // Wrap the character in quotes for clarity
         })
         .style("font-size", "13px")
         .style("fill", "#222");

@@ -9,19 +9,18 @@ export function buildTable(text) {
     const tableData = Array.from(counts, ([char, count]) => {
         return {
             char: char,
-            count: count,
             freq: count / text.length
         };
     });
 
-    tableData.sort((a, b) => b.count - a.count);
+    tableData.sort((a, b) => a.freq - b.freq);
     
     return tableData;
 }
 
 export function createTable(table) {
     const tableElement = document.createElement("table");
-    const headers = ["Character", "Count", "Frequency"];
+    const headers = ["Character", "Frequency"];
     const headerRow = document.createElement("tr");
     tableElement.className = "freq-table";
     headers.forEach(text => {
@@ -38,10 +37,6 @@ export function createTable(table) {
         const charCell = document.createElement("td");
         charCell.textContent = `'${char}'`;
         row.appendChild(charCell); 
-
-        const countCell = document.createElement("td");
-        countCell.textContent = count;
-        row.appendChild(countCell);
 
         const freqCell = document.createElement("td");
         freqCell.textContent = freq.toFixed(4);
