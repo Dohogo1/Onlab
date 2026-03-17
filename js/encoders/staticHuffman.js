@@ -1,10 +1,8 @@
 import BiNode from "../biNode.js";
 
 export default class StaticHuffman {
-
     constructor(table) {
         this.table = table;
-
         this.solutions = []; // all possible unique Huffman trees
     }
 
@@ -16,8 +14,7 @@ export default class StaticHuffman {
         this.explore(forest, []);
     }
 
-    explore(forest, steps) {
-
+   explore(forest, steps) {
         forest = this.cloneForest(forest);
 
         // record current state
@@ -32,42 +29,59 @@ export default class StaticHuffman {
             return;
         }
 
-        forest.sort((a, b) => {
-            // 1. Sort by frequency first
-            if (a.freq !== b.freq) return a.freq - b.freq;
-            
-            // 2. TIE-BREAKER: If frequencies match, put internal/parent nodes BEFORE leaves
-            const aIsLeaf = a.isLeaf() ? 1 : 0;
-            const bIsLeaf = b.isLeaf() ? 1 : 0;
-            return aIsLeaf - bIsLeaf; 
-        });
+        // Sort by frequency
+        forest.sort((a, b) => a.freq - b.freq);
 
-        const minFreq = forest[0].freq;
-
-        const minNodes = forest.filter(n => n.freq === minFreq);
-
-        let pairs;
-
-        // branching only if >=3 nodes share smallest frequency
-        if (minNodes.length >= 3) {
-            pairs = this.getCanonicalPairs(minNodes);
-        } else {
-            pairs = [[forest[0], forest[1]]];
+        const freq1 = forest[0].freq;
+        const s1Indices = [];
+        
+        // 1. Find ALL nodes that are tied for the absolute smallest frequency
+        for (let i = 0; i < forest.length; i++) {
+            // Using a tiny epsilon for float comparison just in case of rounding errors
+            if (Math.abs(forest[i].freq - freq1) < 0.00001) {
+                s1Indices.push(i);
+            }
         }
 
-        for (const [a, b] of pairs) {
+        let indexPairs = [];
 
+        if (s1Indices.length >= 2) {
+            // SCENARIO A: Multiple nodes tied for smallest. Pair all possible combinations of them!
+            for (let i = 0; i < s1Indices.length; i++) {
+                for (let j = i + 1; j < s1Indices.length; j++) {
+                    indexPairs.push([s1Indices[i], s1Indices[j]]);
+                }
+            }
+        } else {
+            // SCENARIO B: Only one absolute smallest node. 
+            // We MUST pair it with the NEXT smallest node... but we have to check for ties there too!
+            const freq2 = forest[1].freq;
+            const s2Indices = [];
+            
+            for (let i = 1; i < forest.length; i++) {
+                if (Math.abs(forest[i].freq - freq2) < 0.00001) {
+                    s2Indices.push(i);
+                }
+            }
+            
+            // Pair the single smallest node (index 0) with EVERY node tied for second-smallest
+            for (let i = 0; i < s2Indices.length; i++) {
+                indexPairs.push([0, s2Indices[i]]);
+            }
+        }
+
+        // Branch out and explore every valid pair we found
+        for (const [idxA, idxB] of indexPairs) {
             const newForest = this.cloneForest(forest);
 
-            const indexA = newForest.findIndex(n => this.sameNode(n, a));
-            const indexB = newForest.findIndex(n => this.sameNode(n, b));
+            const nodeA = newForest[idxA];
+            const nodeB = newForest[idxB];
 
-            const nodeA = newForest[indexA];
-            const nodeB = newForest[indexB];
+            // Remove items by index (Larger index first so the array doesn't shift!)
+            newForest.splice(Math.max(idxA, idxB), 1);
+            newForest.splice(Math.min(idxA, idxB), 1);
 
-            newForest.splice(Math.max(indexA, indexB), 1);
-            newForest.splice(Math.min(indexA, indexB), 1);
-
+            // Create the parent
             const parent = new BiNode(null, nodeA.freq + nodeB.freq);
             parent.left = nodeA;
             parent.right = nodeB;
@@ -78,25 +92,10 @@ export default class StaticHuffman {
         }
     }
 
-    getCanonicalPairs(nodes) {
-
-        const pairs = [];
-
-        const first = nodes[0];
-
-        for (let i = 1; i < nodes.length; i++) {
-            pairs.push([first, nodes[i]]);
-        }
-
-        return pairs;
-    }
-
     createVisualizationRoot(forest) {
-
         if (forest.length === 1) {
             return this.cloneNode(forest[0]);
         }
-
         return {
             children: forest.map(n => this.cloneNode(n))
         };
@@ -107,18 +106,12 @@ export default class StaticHuffman {
     }
 
     cloneNode(node) {
-
         if (!node) return null;
 
         const newNode = new BiNode(node.char, node.freq);
-
         newNode.left = this.cloneNode(node.left);
         newNode.right = this.cloneNode(node.right);
 
         return newNode;
-    }
-
-    sameNode(a, b) {
-        return a.char === b.char && a.freq === b.freq;
     }
 }

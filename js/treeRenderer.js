@@ -1,15 +1,17 @@
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
-export function renderTree(rootNode) {
-    // 1. Clear any existing SVG
-    d3.select("#tree").selectAll("*").remove();
+export function renderTree(rootNode, containerSelector = "#tree") {
+    // 1. Clear any existing SVG in this specific container
+    const container = d3.select(containerSelector);
+    container.selectAll("*").remove();
 
     // 2. Set up dimensions
     const width = 600;
     const height = 400;
     const margin = { top: 40, right: 20, bottom: 60, left: 20 };
 
-    const svg = d3.select("#tree")
+    // Append to the passed container instead of hardcoded #tree
+    const svg = container 
         .append("svg")
         .attr("width", width)
         .attr("height", height)
