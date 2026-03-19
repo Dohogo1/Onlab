@@ -10,11 +10,11 @@ textInput.type = "text";
 textInput.placeholder = "Enter text here...";
 textInput.style.marginRight = "10px";
 
-const startButton = document.createElement("button");
-startButton.textContent = "Start";
+const enterButton = document.createElement("button");
+enterButton.textContent = "Enter";
 
 controlsContainer.appendChild(textInput);
-controlsContainer.appendChild(startButton);
+controlsContainer.appendChild(enterButton);
 
 // --- 2. SETUP THE TABLE ---
 const ftableContainer = document.getElementById("ftable");
@@ -25,7 +25,7 @@ ftableContainer.appendChild(currentTable);
 currentTable.addEventListener("input", readTableAndUpdateTrees);
 
 // MODE 1: Text Input Mode (Clicking Start)
-startButton.addEventListener("click", () => {
+enterButton.addEventListener("click", () => {
     const text = textInput.value;
     const freqTableData = freqTable.buildTable(text.toLowerCase());
     
@@ -91,7 +91,7 @@ function renderAllTrees(solutions, treeWrapper) {
     treeWrapper.innerHTML = ""; 
     treeWrapper.style.display = "flex";
     treeWrapper.style.flexWrap = "wrap";        
-    treeWrapper.style.gap = "20px";             
+    treeWrapper.style.gap = "5px";             
     treeWrapper.style.justifyContent = "center"; 
 
     if (solutions.length > 0) {
@@ -102,7 +102,7 @@ function renderAllTrees(solutions, treeWrapper) {
             cardDiv.style.alignItems = "center";
 
             const title = document.createElement("h3");
-            title.textContent = `Valid Tree Variation ${index + 1}`;
+            title.textContent = `Tree Variation ${index + 1}`;
             title.style.margin = "10px 0";
             cardDiv.appendChild(title);
 
