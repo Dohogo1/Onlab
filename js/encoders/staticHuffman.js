@@ -100,8 +100,9 @@ export default class StaticHuffman {
 
             this.explore(newForest, newSteps);
         }
+        
     }
-
+//TODO máshova?
     createVisualizationRoot(forest) {
         if (forest.length === 1) {
             return this.cloneNode(forest[0]);
@@ -116,6 +117,11 @@ export default class StaticHuffman {
         return forest.map(n => this.cloneNode(n));
     }
 
+    /**
+     * Clones a given node of the tree
+     * @param {*} node the node to be cloned
+     * @returns new node with the same character, frequency and parents
+     */
     cloneNode(node) {
         if (!node) return null;
 

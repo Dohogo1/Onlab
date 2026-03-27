@@ -12,8 +12,11 @@ textInput.style.marginRight = "10px";
 
 const enterButton = document.createElement("button");
 enterButton.textContent = "Enter";
+const enterButton = document.createElement("button");
+enterButton.textContent = "Enter";
 
 controlsContainer.appendChild(textInput);
+controlsContainer.appendChild(enterButton);
 controlsContainer.appendChild(enterButton);
 
 // --- 2. SETUP THE TABLE ---
@@ -91,7 +94,7 @@ function renderAllTrees(solutions, treeWrapper) {
     treeWrapper.innerHTML = ""; 
     treeWrapper.style.display = "flex";
     treeWrapper.style.flexWrap = "wrap";        
-    treeWrapper.style.gap = "20px";             
+    treeWrapper.style.gap = "5px";             
     treeWrapper.style.justifyContent = "center"; 
 
     if (solutions.length > 0) {
@@ -102,6 +105,7 @@ function renderAllTrees(solutions, treeWrapper) {
             cardDiv.style.alignItems = "center";
 
             const title = document.createElement("h3");
+            title.textContent = `Tree Variation ${index + 1}`;
             title.textContent = `Tree Variation ${index + 1}`;
             title.style.margin = "10px 0";
             cardDiv.appendChild(title);

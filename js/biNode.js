@@ -1,3 +1,6 @@
+/**
+ * Class representing a node in a binary tree
+ */
 export default class BiNode {
     constructor(char, freq) {
         this.char = char;
