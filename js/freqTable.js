@@ -17,7 +17,7 @@ export function createTable(table) {
     const tableElement = document.createElement("table");
     tableElement.className = "freq-table";
     
-    // Create headers (added an empty one for the delete button)
+    // Create headers 
     const headerRow = document.createElement("tr");
     ["Character", "Frequency", ""].forEach(text => {
         const th = document.createElement("th");
@@ -30,7 +30,7 @@ export function createTable(table) {
     const addRow = (char, freq) => {
         const row = document.createElement("tr");
 
-        // 1. Editable Character Cell
+        // Editable Character Cell
         const charCell = document.createElement("td");
         const charInput = document.createElement("input");
         charInput.type = "text";
@@ -41,21 +41,21 @@ export function createTable(table) {
         charCell.appendChild(charInput);
         row.appendChild(charCell); 
 
-        // 2. Editable Frequency Cell
+        // Editable Frequency Cell
         const freqCell = document.createElement("td");
         const freqInput = document.createElement("input");
         freqInput.type = "number";
         freqInput.step = "0.0001";
         freqInput.min = "0";
         
-        freqInput.value = freq !== "" ? parseFloat(Number(freq).toFixed(4)) : "";
+        freqInput.value = freq;
         
         freqInput.className = "freq-input";
         freqInput.style.width = "80px";
         freqCell.appendChild(freqInput);
         row.appendChild(freqCell);
 
-        // 3. Delete Row Button
+        // Delete Row Button
         const delCell = document.createElement("td");
         const delBtn = document.createElement("button");
         delBtn.textContent = "X";
@@ -70,19 +70,19 @@ export function createTable(table) {
         tableElement.appendChild(row);
     };
 
-    // Populate the table if data was passed in (from the text box)
+    // Populate the table if data was passed in
     for(const {char, freq} of table) {
         addRow(char, freq);
     }
 
     wrapper.appendChild(tableElement);
 
-    // "Add Row" button for manual mode
+    // "Add Row" button 
     const addBtn = document.createElement("button");
     addBtn.textContent = "+ Add Row";
     addBtn.style.marginTop = "10px";
     addBtn.addEventListener("click", () => {
-        addRow("", ""); // Add an empty row
+        addRow("", ""); 
     });
     wrapper.appendChild(addBtn);
 

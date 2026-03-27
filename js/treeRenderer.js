@@ -6,9 +6,9 @@ export function renderTree(rootNode, containerSelector = "#tree") {
     container.selectAll("*").remove();
 
     // 2. Set up dimensions
-    const width = 600;
-    const height = 400;
-    const margin = { top: 40, right: 20, bottom: 60, left: 20 };
+    const width = 450;
+    const height = 300;
+    const margin = { top: 40, right: 10, bottom: 40, left: 10 };
 
     // Append to the passed container instead of hardcoded #tree
     const svg = container 

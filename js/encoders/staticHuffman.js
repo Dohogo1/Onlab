@@ -7,6 +7,7 @@ export default class StaticHuffman {
     }
 
     build() {
+        //create initial forest of BiNodes from the frequency table
         const forest = Object.entries(this.table).map(
             ([char, freq]) => new BiNode(char, freq)
         );
@@ -14,13 +15,14 @@ export default class StaticHuffman {
         this.explore(forest, []);
     }
 
-   explore(forest, steps) {
+    explore(forest, steps) {
         forest = this.cloneForest(forest);
 
         // record current state
         const stepRoot = this.createVisualizationRoot(forest);
         const newSteps = [...steps, { root: stepRoot }];
 
+        //stop, if the tree is finished
         if (forest.length === 1) {
             this.solutions.push({
                 root: forest[0],
@@ -29,60 +31,68 @@ export default class StaticHuffman {
             return;
         }
 
-        // Sort by frequency
+        // sort by frequency
         forest.sort((a, b) => a.freq - b.freq);
 
         const freq1 = forest[0].freq;
-        const s1Indices = [];
+        const s1Indexes = [];
         
-        // 1. Find ALL nodes that are tied for the absolute smallest frequency
+        // find nodes that are tied for the smallest frequency
         for (let i = 0; i < forest.length; i++) {
-            // Using a tiny epsilon for float comparison just in case of rounding errors
+            // using epsilon for float comparison in case of rounding errors
             if (Math.abs(forest[i].freq - freq1) < 0.00001) {
-                s1Indices.push(i);
+                s1Indexes.push(i);
             }
         }
 
         let indexPairs = [];
 
-        if (s1Indices.length >= 2) {
-            // SCENARIO A: Multiple nodes tied for smallest. Pair all possible combinations of them!
-            for (let i = 0; i < s1Indices.length; i++) {
-                for (let j = i + 1; j < s1Indices.length; j++) {
-                    indexPairs.push([s1Indices[i], s1Indices[j]]);
+        if (s1Indexes.length >= 2) {
+            // if multiple nodes tied for smallest, pair all possible combinations
+            for (let i = 0; i < s1Indexes.length; i++) {
+                for (let j = i + 1; j < s1Indexes.length; j++) {
+                    indexPairs.push([s1Indexes[i], s1Indexes[j]]);
                 }
             }
         } else {
-            // SCENARIO B: Only one absolute smallest node. 
-            // We MUST pair it with the NEXT smallest node... but we have to check for ties there too!
+            // second smallest frequency ties
             const freq2 = forest[1].freq;
-            const s2Indices = [];
+            const s2Indexes = [];
             
             for (let i = 1; i < forest.length; i++) {
                 if (Math.abs(forest[i].freq - freq2) < 0.00001) {
-                    s2Indices.push(i);
+                    s2Indexes.push(i);
                 }
             }
             
-            // Pair the single smallest node (index 0) with EVERY node tied for second-smallest
-            for (let i = 0; i < s2Indices.length; i++) {
-                indexPairs.push([0, s2Indices[i]]);
+            // pair the single smallest node with every node tied for second-smallest
+            for (let i = 0; i < s2Indexes.length; i++) {
+                indexPairs.push([0, s2Indexes[i]]);
             }
         }
 
-        // Branch out and explore every valid pair we found
+        // branch out and explore every valid pair we found
         for (const [idxA, idxB] of indexPairs) {
             const newForest = this.cloneForest(forest);
+            
+            idxA < idxB ? [idxA, idxB] : [idxB, idxA];
 
             const nodeA = newForest[idxA];
             const nodeB = newForest[idxB];
 
-            // Remove items by index (Larger index first so the array doesn't shift!)
-            newForest.splice(Math.max(idxA, idxB), 1);
-            newForest.splice(Math.min(idxA, idxB), 1);
+            // remove items by index without shifting the array
+            newForest.splice(idxB, 1);
+            newForest.splice(idxA, 1);
 
-            // Create the parent
-            const parent = new BiNode(null, nodeA.freq + nodeB.freq);
+            let parent;
+            // create the parent
+            if (forest.length === 2){
+                // if last parent node, set freq to 1 to avoid rounding issues
+                parent = new BiNode(null, 1);
+            }
+            else {
+                parent = new BiNode(null, nodeA.freq + nodeB.freq);
+            }
             parent.left = nodeA;
             parent.right = nodeB;
 
@@ -101,6 +111,7 @@ export default class StaticHuffman {
         };
     }
 
+    
     cloneForest(forest) {
         return forest.map(n => this.cloneNode(n));
     }
@@ -114,4 +125,5 @@ export default class StaticHuffman {
 
         return newNode;
     }
+
 }
