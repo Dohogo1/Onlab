@@ -12,8 +12,6 @@ textInput.style.marginRight = "10px";
 
 const enterButton = document.createElement("button");
 enterButton.textContent = "Enter";
-const enterButton = document.createElement("button");
-enterButton.textContent = "Enter";
 
 controlsContainer.appendChild(textInput);
 controlsContainer.appendChild(enterButton);

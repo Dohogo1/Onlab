@@ -13,6 +13,8 @@ export default class StaticHuffman {
         );
 
         this.explore(forest, []);
+
+        this.filterUniqueShapes();
     }
 
     explore(forest, steps) {
@@ -84,8 +86,8 @@ export default class StaticHuffman {
             newForest.splice(idxB, 1);
             newForest.splice(idxA, 1);
 
-            let parent;
             // create the parent
+            let parent;
             if (forest.length === 2){
                 // if last parent node, set freq to 1 to avoid rounding issues
                 parent = new BiNode(null, 1);
@@ -100,7 +102,6 @@ export default class StaticHuffman {
 
             this.explore(newForest, newSteps);
         }
-        
     }
 //TODO máshova?
     createVisualizationRoot(forest) {
@@ -130,6 +131,38 @@ export default class StaticHuffman {
         newNode.right = this.cloneNode(node.right);
 
         return newNode;
+    }
+
+    getTreeShape(node) {
+        if (!node) return "";
+        
+        // If it is a leaf node (no children), just return "L"
+        if (!node.left && !node.right) {
+            return "L";
+        }
+        
+        // If it is a parent node, wrap its children's shapes in parentheses
+        const leftShape = this.getTreeShape(node.left);
+        const rightShape = this.getTreeShape(node.right);
+        
+        return "(" + leftShape + "," + rightShape + ")";
+    }
+
+    filterUniqueShapes() {
+        const seenShapes = new Set();
+        const uniqueSolutions = [];
+
+        for (const solution of this.solutions) {
+            const shapeString = this.getTreeShape(solution.root);
+            
+            if (!seenShapes.has(shapeString)) {
+                seenShapes.add(shapeString); // Remember this shape
+                uniqueSolutions.push(solution); // Keep the solution
+            }
+        }
+
+        // Replace the bulky solutions array with our newly filtered one
+        this.solutions = uniqueSolutions; 
     }
 
 }
