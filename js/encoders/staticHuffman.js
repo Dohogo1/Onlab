@@ -6,15 +6,16 @@ export default class StaticHuffman {
         this.solutions = []; // all possible unique Huffman trees
     }
 
-    build() {
+    build(showAll = true) {
         //create initial forest of BiNodes from the frequency table
         const forest = Object.entries(this.table).map(
             ([char, freq]) => new BiNode(char, freq)
         );
 
         this.explore(forest, []);
-
-        this.filterUniqueShapes();
+        if (!showAll) {
+            this.filterUniqueShapes();
+        }
     }
 
     explore(forest, steps) {

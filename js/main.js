@@ -2,23 +2,20 @@ import * as freqTable from "./freqTable.js";
 import { renderTree } from './treeRenderer.js';
 import StaticHuffman from './encoders/staticHuffman.js';
 
+
 // --- 1. BUILD THE UI CONTROLS ---
-const controlsContainer = document.getElementById("controls");
+const textInput = document.getElementById("text-input");
+const enterButton = document.getElementById("enter-button");
+const ftableContainer = document.getElementById("ftable");
+const treeContainer = document.getElementById("tree");
+const showAllCheckbox = document.getElementById("show-all-trees");
 
-const textInput = document.createElement("input");
-textInput.type = "text";
-textInput.placeholder = "Enter text here...";
-textInput.style.marginRight = "10px";
-
-const enterButton = document.createElement("button");
-enterButton.textContent = "Enter";
-
-controlsContainer.appendChild(textInput);
-controlsContainer.appendChild(enterButton);
-controlsContainer.appendChild(enterButton);
+showAllCheckbox.addEventListener("change", () => {
+    // Whenever the user checks/unchecks, trigger the tree update
+    readTableAndUpdateTrees(); 
+});
 
 // --- 2. SETUP THE TABLE ---
-const ftableContainer = document.getElementById("ftable");
 
 // Initialize an empty table immediately for manual mode
 let currentTable = freqTable.createTable([]);
@@ -46,6 +43,7 @@ enterButton.addEventListener("click", () => {
 function readTableAndUpdateTrees() {
     const rows = document.querySelectorAll(".freq-table tr");
     const huffmanInputObj = {};
+    const showAllTrees = showAllCheckbox.checked;
     let totalProbability = 0; 
 
     rows.forEach(row => {
@@ -83,7 +81,7 @@ function readTableAndUpdateTrees() {
 
     // 3. If everything is perfect, build the trees!
     const huffman = new StaticHuffman(huffmanInputObj);
-    huffman.build();
+    huffman.build(showAllTrees);
     renderAllTrees(huffman.solutions, treeWrapper);
 }
 
