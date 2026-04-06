@@ -1,121 +1,34 @@
-import * as freqTable from "./freqTable.js";
-import { renderTree } from './treeRenderer.js';
-import StaticHuffman from './encoders/staticHuffman.js';
+import { initStaticHuffman } from './controllers/staticHuffmanController.js';
 
+const appContainer = document.getElementById("app-container");
+const algoSelect = document.getElementById("algo-select");
 
-// --- 1. BUILD THE UI CONTROLS ---
-const textInput = document.getElementById("text-input");
-const enterButton = document.getElementById("enter-button");
-const ftableContainer = document.getElementById("ftable");
-const treeContainer = document.getElementById("tree");
-const showAllCheckbox = document.getElementById("show-all-trees");
-
-showAllCheckbox.addEventListener("change", () => {
-    // Whenever the user checks/unchecks, trigger the tree update
-    readTableAndUpdateTrees(); 
-});
-
-// --- 2. SETUP THE TABLE ---
-
-// Initialize an empty table immediately for manual mode
-let currentTable = freqTable.createTable([]);
-ftableContainer.appendChild(currentTable);
-currentTable.addEventListener("input", readTableAndUpdateTrees);
-
-// MODE 1: Text Input Mode
-enterButton.addEventListener("click", () => {
-    const text = textInput.value;
-    const freqTableData = freqTable.buildTable(text.toLowerCase());
-    
-    // Replace the old table with the newly generated one
-    ftableContainer.innerHTML = ""; 
-    currentTable = freqTable.createTable(freqTableData);
-    ftableContainer.appendChild(currentTable);
-    
-    // Listen for manual edits on the new table
-    currentTable.addEventListener("input", readTableAndUpdateTrees);
-    
-    // Render the initial trees
-    readTableAndUpdateTrees();
-});
-
-// MODE 2: Manual Edit Mode (Reading data live from the table)
-function readTableAndUpdateTrees() {
-    const rows = document.querySelectorAll(".freq-table tr");
-    const huffmanInputObj = {};
-    const showAllTrees = showAllCheckbox.checked;
-    let totalProbability = 0; 
-
-    rows.forEach(row => {
-        const charInput = row.querySelector(".char-input");
-        const freqInput = row.querySelector(".freq-input");
-        
-        if (charInput && freqInput) {
-            const char = charInput.value;
-            const freq = parseFloat(freqInput.value);
-            
-            // Only add to the tree if both a character and a valid frequency exist
-            if (char && freq > 0) {
-                huffmanInputObj[char] = (huffmanInputObj[char] || 0) + freq;
-                totalProbability += freq; 
-            }
+const algorithms = {
+    "static-huffman": {
+        title: "Static Huffman Coding",
+        render: initStaticHuffman
+    },
+    "adaptive-huffman": {
+        title: "Adaptive Huffman (FGK/Vitter)",
+        render: (container) => {
+            container.innerHTML = `<h2>${algorithms["adaptive-huffman"].title}</h2>
+                                <p>Adaptive Huffman logic goes here...</p>`;
         }
-    });
-
-    const treeWrapper = document.getElementById("tree");
-
-    // 1. Check if the table is completely empty
-    if (Object.keys(huffmanInputObj).length === 0) {
-        treeWrapper.innerHTML = ""; 
-        return;
     }
+};
 
-    // 2. Check if the probabilities add up to exactly 1 (accounting for float math quirks)
-    if (Math.abs(totalProbability - 1) > 0.0001) {
-        treeWrapper.innerHTML = `<h3 style="color: #d9534f; width: 100%; text-align: center;">
-            The sum of all frequencies must equal exactly 1.<br>
-            <span style="font-size: 0.8em; color: #555;">Current sum: ${totalProbability.toFixed(4)}</span>
-        </h3>`;
-        return;
-    }
+function switchAlgorithm(algoKey) {
+    appContainer.innerHTML = "";
 
-    // 3. If everything is perfect, build the trees!
-    const huffman = new StaticHuffman(huffmanInputObj);
-    huffman.build(showAllTrees);
-    renderAllTrees(huffman.solutions, treeWrapper);
-}
+    const algo = algorithms[algoKey];
 
-// Render helper for the layout
-function renderAllTrees(solutions, treeWrapper) {
-    treeWrapper.innerHTML = ""; 
-    treeWrapper.style.display = "flex";
-    treeWrapper.style.flexWrap = "wrap";        
-    treeWrapper.style.gap = "5px";             
-    treeWrapper.style.justifyContent = "center"; 
-
-    if (solutions.length > 0) {
-        solutions.forEach((solution, index) => {
-            const cardDiv = document.createElement("div");
-            cardDiv.style.display = "flex";
-            cardDiv.style.flexDirection = "column"; 
-            cardDiv.style.alignItems = "center";
-
-            const title = document.createElement("h3");
-            title.textContent = `Tree Variation ${index + 1}`;
-            title.textContent = `Tree Variation ${index + 1}`;
-            title.style.margin = "10px 0";
-            cardDiv.appendChild(title);
-
-            const treeDivId = `tree-solution-${index}`;
-            const treeDiv = document.createElement("div");
-            treeDiv.id = treeDivId;
-            cardDiv.appendChild(treeDiv);
-
-            treeWrapper.appendChild(cardDiv);
-
-            renderTree(solution.root, `#${treeDivId}`);
-        });
-    } else {
-        treeWrapper.innerHTML = "<p>Not enough valid data to build a tree.</p>";
+    if (algo) {
+        algo.render(appContainer);
     }
 }
+
+algoSelect.addEventListener("change", (e) => {
+    switchAlgorithm(e.target.value);
+});
+
+switchAlgorithm("static-huffman");

@@ -8,7 +8,7 @@ export function renderTree(rootNode, containerSelector = "#tree") {
     // 2. Set up dimensions
     const width = 450;
     const height = 300;
-    const margin = { top: 40, right: 10, bottom: 40, left: 10 };
+    const margin = { top: 40, right: 0, bottom: 40, left: 0 };
 
     // Append to the passed container instead of hardcoded #tree
     const svg = container 
@@ -26,7 +26,7 @@ export function renderTree(rootNode, containerSelector = "#tree") {
         return children.length > 0 ? children : null;
     });
 
-    // NEW: Sort the tree so the smaller frequencies always go to the left
+    // Sort the tree so the smaller frequencies always go to the left
     root.sort((a, b) => b.data.freq - a.data.freq);
 
 

@@ -8,18 +8,20 @@
 </head>
 <body>
 
-<h1>Static Huffman Coding</h1>
+<nav id="menu-bar">
+        <h2 style="margin: 0; font-size: 1.2rem;">Coding Visualizer</h2>
+        
+        <div class="selector-group">
+            <label for="algo-select" style="font-weight: bold;">Algorithm:</label>
+            <select id="algo-select" style="padding: 5px; border-radius: 4px;">
+                <option value="static-huffman">Static Huffman</option>
+                <option value="adaptive-huffman">Adaptive Huffman</option>
+            </select>
+        </div>
+    </nav>
 
-<div id="controls">
-    <input type="text" id="text-input" placeholder="Enter text here...">
-    <button id="enter-button">Enter</button>
-    <input type="checkbox" id="show-all-trees">
-    <label for="show-all-trees" >Show All Tree Variations</label>
-</div>
-<br>
-<div id="ftable"></div>
-<div id="tree"></div>
-<div id="output"></div>
+    <main id="app-container" style="padding: 20px;">
+        </main>
 
 </body>
 <script type="module" src="./js/main.js"></script>
