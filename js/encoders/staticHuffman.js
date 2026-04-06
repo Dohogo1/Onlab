@@ -3,7 +3,7 @@ import BiNode from "../biNode.js";
 export default class StaticHuffman {
     constructor(table) {
         this.table = table;
-        this.solutions = []; // all possible unique Huffman trees
+        this.solutions = []; // all possible Huffman trees
     }
 
     build(showAll = true) {
@@ -104,7 +104,7 @@ export default class StaticHuffman {
             this.explore(newForest, newSteps);
         }
     }
-//TODO máshova?
+    
     createVisualizationRoot(forest) {
         if (forest.length === 1) {
             return this.cloneNode(forest[0]);
