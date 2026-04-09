@@ -1,4 +1,5 @@
 import { initStaticHuffman } from './controllers/staticHuffmanController.js';
+import { initAdaptiveHuffman } from './controllers/adaptiveController.js';
 
 const appContainer = document.getElementById("app-container");
 const algoSelect = document.getElementById("algo-select");
@@ -10,10 +11,7 @@ const algorithms = {
     },
     "adaptive-huffman": {
         title: "Adaptive Huffman (FGK/Vitter)",
-        render: (container) => {
-            container.innerHTML = `<h2>${algorithms["adaptive-huffman"].title}</h2>
-                                <p>Adaptive Huffman logic goes here...</p>`;
-        }
+        render: initAdaptiveHuffman
     }
 };
 

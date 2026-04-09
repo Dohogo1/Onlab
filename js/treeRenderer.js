@@ -27,7 +27,7 @@ export function renderTree(rootNode, containerSelector = "#tree") {
     });
 
     // Sort the tree so the smaller frequencies always go to the left
-    root.sort((a, b) => b.data.freq - a.data.freq);
+    //root.sort((a, b) => b.data.freq - a.data.freq);
 
 
     // 4. Map the hierarchy to a tree layout
