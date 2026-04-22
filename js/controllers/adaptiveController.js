@@ -129,8 +129,7 @@ export function initAdaptiveHuffman(container) {
 
         // 5. Clear the Table and the Tree
         renderTable(null);
-        const svgContainer = d3.select("#tree-area");
-        svgContainer.selectAll("*").remove(); 
+        container.querySelector("#tree-area").innerHTML = "";
     });
 
     container.querySelector("#prev-btn").addEventListener("click", () => { if (currentStep > 0) { currentStep--; renderStep(); } });
