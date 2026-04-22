@@ -12,7 +12,7 @@ export function initStaticHuffman(container) {
         </div>
         <div id="ftable-workspace" style="display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;">
             <div id="table-area"></div>
-            <div id="tree-area" style="flex-grow: 1;"></div>
+            <div id="tree-area" style="flex-grow: 1; display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;"></div>
         </div>
     `;
 
@@ -51,7 +51,14 @@ export function initStaticHuffman(container) {
         huffman.solutions.forEach((sol, i) => {
             const div = document.createElement("div");
             div.id = `tree-sol-${i}`;
-            div.style.textAlign = "center"; 
+            
+            // FIX: Add styling to each solution container to prevent overlap
+            div.style.flex = "0 1 auto"; 
+            div.style.textAlign = "center";
+            div.style.padding = "10px";
+            div.style.border = "1px solid #eee";
+            div.style.borderRadius = "8px";
+
             treeArea.appendChild(div);
             renderTree(sol.root, `#${div.id}`);
         });
