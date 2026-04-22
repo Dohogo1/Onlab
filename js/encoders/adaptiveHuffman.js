@@ -6,6 +6,7 @@ class AdaptiveNode {
         this.left = null;
         this.right = null;
         this.parent = null;
+        this.highlight = null;
     }
     get freq() {
         return this.weight;
@@ -41,6 +42,7 @@ export default class AdaptiveHuffman {
     processChar(char) {
         let code = "";
         let currNode;
+        this.clearHighlights(this.root);
 
         // 1. Seen this symbol before?
         if (!this.seen.has(char)) {
@@ -59,6 +61,11 @@ export default class AdaptiveHuffman {
             newNyt.parent = oldNyt;
             newCharNode.parent = oldNyt;
 
+            // Highlight the brand new nodes
+            newCharNode.highlight = "new";
+            newNyt.highlight = "new";
+            oldNyt.highlight = "split";
+
             this.nyt = newNyt;
             this.seen.set(char, newCharNode);
             this.nodes.push(newNyt, newCharNode);
@@ -72,20 +79,25 @@ export default class AdaptiveHuffman {
             this.currentOutput += code;
         }
 
-        // Update loop up to the root
         while (currNode !== null) {
-            // Is this the maximum ordered node in its weight class?
-            let maxNode = this.findMaxOrderedInWeightClass(currNode.weight);
+            // Find the highest ordered node in the SAME VITTER BLOCK (same weight AND same type)
+            let maxNode = this.findMaxVitterNode(currNode);
             
-            // Swap with highest ordered node in weight class (if it's not itself or its parent)
+            // Swap with highest ordered node in block (if it's not itself or its parent)
             if (maxNode !== currNode && currNode.parent !== maxNode) {
                 this.swapNodes(currNode, maxNode);
+                currNode.highlight = "swap";
+                maxNode.highlight = "swap";
+            }
+
+            if (!currNode.highlight) {
+                currNode.highlight = "weight";
             }
 
             // Increment Node weight
             currNode.weight += 1;
             
-            // Go to parent (Is this the root node? NO -> repeat)
+            // Move up to the parent
             currNode = currNode.parent;
         }
 
@@ -109,6 +121,21 @@ export default class AdaptiveHuffman {
             root: this.cloneTree(this.root),
             weights: currentWeights // <--- This is what the controller will read
         });
+    }
+
+    findMaxVitterNode(targetNode) {
+        let maxNode = null;
+        let isTargetLeaf = targetNode.isLeaf();
+
+        for (let n of this.nodes) {
+            // Vitter's Rule: Must be same weight AND same type (leaf vs internal)
+            if (n.weight === targetNode.weight && n.isLeaf() === isTargetLeaf) {
+                if (!maxNode || n.order > maxNode.order) {
+                    maxNode = n;
+                }
+            }
+        }
+        return maxNode || targetNode; // Fallback to itself if no other nodes in block
     }
 
     getPath(node) {
@@ -158,5 +185,12 @@ export default class AdaptiveHuffman {
         clone.right = this.cloneTree(node.right);
         if (clone.right) clone.right.parent = clone;
         return clone;
+    }
+
+    clearHighlights(node) {
+        if (!node) return;
+        node.highlight = null;
+        this.clearHighlights(node.left);
+        this.clearHighlights(node.right);
     }
 }

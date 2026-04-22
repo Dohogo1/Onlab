@@ -5,9 +5,10 @@ export function initAdaptiveHuffman(container) {
     container.innerHTML = `
         <h1>Adaptive Huffman Coding</h1>
         
-        <div class="control-panel" style="background: #f4f4f4; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; gap: 15px; align-items: center;">
+        <div class="control-panel" style="background: #f4f4f4; padding: 10px; border-radius: 8px; margin-bottom: 20px; display: flex; gap: 15px; align-items: center;">
             <input type="text" id="init-text" placeholder="Initial string..." style="padding: 5px;">
             <button id="start-btn">Start</button>
+            <button id="reset-btn">Reset</button>
             <span style="border-left: 2px solid #ccc; height: 20px;"></span>
             <input type="text" id="append-text" placeholder="Append..." style="padding: 5px; width: 80px;" disabled>
             <button id="append-btn" disabled>Append</button>
@@ -77,6 +78,7 @@ export function initAdaptiveHuffman(container) {
         const text = container.querySelector("#init-text").value;
         if (!text) return;
         container.querySelector("#start-btn").disabled = true;
+        container.querySelector("#init-text").disabled = true;
         encoder = new AdaptiveHuffman();
         encoder.encode(text);
         currentStep = 0;
@@ -99,9 +101,36 @@ export function initAdaptiveHuffman(container) {
         currentStep = 0;
         renderStep();
     });
+
     container.querySelector("#last-btn").addEventListener("click", () => {
         currentStep = encoder.snapshots.length - 1;
         renderStep();
+    });
+
+    container.querySelector("#reset-btn").addEventListener("click", () => {
+        // 1. Destroy the current encoder
+        encoder = null;
+        currentStep = 0;
+
+        // 2. Clear out all the text inputs
+        container.querySelector("#init-text").value = "";
+        container.querySelector("#append-text").value = "";
+
+        // 3. Reset the UI locks
+        container.querySelector("#init-text").disabled = false;
+        container.querySelector("#start-btn").disabled = false;
+        container.querySelector("#append-text").disabled = true;
+        container.querySelector("#append-btn").disabled = true;
+
+        // 4. Hide the controls and clear the output text
+        container.querySelector("#step-controls").style.display = "none";
+        charDisplay.textContent = "-";
+        outputDisplay.textContent = "-";
+
+        // 5. Clear the Table and the Tree
+        renderTable(null);
+        const svgContainer = d3.select("#tree-area");
+        svgContainer.selectAll("*").remove(); 
     });
 
     container.querySelector("#prev-btn").addEventListener("click", () => { if (currentStep > 0) { currentStep--; renderStep(); } });

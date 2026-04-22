@@ -2,23 +2,12 @@ import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
 export function renderTree(rootNode, containerSelector = "#tree") {
     // 1. Clear any existing SVG in this specific container
+
     const container = d3.select(containerSelector);
     container.selectAll("*").remove();
 
-    // 2. Set up dimensions
-    const width = 450;
-    const height = 300;
-    const margin = { top: 40, right: 0, bottom: 40, left: 0 };
-
-    // Append to the passed container instead of hardcoded #tree
-    const svg = container 
-        .append("svg")
-        .attr("width", width)
-        .attr("height", height)
-        .append("g")
-        .attr("transform", `translate(${margin.left},${margin.top})`);
-
-    // 3. Convert your binary node to a D3 Hierarchy
+    // 2. Convert your binary node to a D3 Hierarchy FIRST
+    // We do this first so we can find out how deep the tree is!
     const root = d3.hierarchy(rootNode, d => {
         const children = [];
         if (d.left) children.push(d.left);
@@ -26,14 +15,27 @@ export function renderTree(rootNode, containerSelector = "#tree") {
         return children.length > 0 ? children : null;
     });
 
-    // Sort the tree so the smaller frequencies always go to the left
-    //root.sort((a, b) => b.data.freq - a.data.freq);
+    // 3. Calculate Dynamic Dimensions
+    const width = 450;
+    const margin = { top: 40, right: 0, bottom: 60, left: 0 };
+    
+    // root.height gives the maximum depth of the tree. 
+    // We give each level 70 pixels of breathing room, with a minimum height of 300.
+    const levelSpacing = 70; 
+    const dynamicHeight = Math.max(300, (root.height * levelSpacing) + margin.top + margin.bottom);
 
+    // Append SVG with the new dynamic height
+    const svg = container 
+        .append("svg")
+        .attr("width", width)
+        .attr("height", dynamicHeight)
+        .append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    // 4. Map the hierarchy to a tree layout
+    // 4. Map the hierarchy to a tree layout using the dynamic height
     const treeLayout = d3.tree().size([
         width - margin.left - margin.right, 
-        height - margin.top - margin.bottom
+        dynamicHeight - margin.top - margin.bottom
     ]);
     treeLayout(root);
 
@@ -86,9 +88,25 @@ export function renderTree(rootNode, containerSelector = "#tree") {
     node.append("circle")
         .attr("r", 20)
         .attr("fill", "#fff")
-        // Check for children: if none (!d.children), it's a leaf! Make it green.
-        .attr("stroke", d => !d.children ? "#90fc99" : "lightblue") 
-        .attr("stroke-width", 3);
+        .attr("stroke", d => {
+            if (d.data.highlight) return "#f1b84c";
+            // Fallback to your original colors if not highlighted
+            return !d.children ? "#90fc99" : "lightblue"; 
+        }) 
+        // Make highlighted nodes slightly thicker
+        .attr("stroke-width", d => d.data.highlight ? 5 : 3)
+        // Optional: Make the "split" NYT node dashed to show it changing
+        .attr("stroke-dasharray", d => {
+            if (d.data.highlight === "split") {
+                const radius = 20; // Your circle's radius
+                const circumference = 2 * Math.PI * radius;
+                const numberOfDashes = 10; // You can change this to get more or fewer dashes
+                const dashLength = circumference / (numberOfDashes * 2);
+                
+                return `${dashLength},${dashLength}`;
+            }
+            return "none";
+        });
 
     node.append("text")
         .attr("dy", "0.31em")
@@ -109,4 +127,26 @@ export function renderTree(rootNode, containerSelector = "#tree") {
         })
         .style("font-size", "13px")
         .style("fill", "#222");
+
+    const orderBadge = node.filter(d => d.data.order !== undefined)
+        .append("g")
+        .attr("transform", "translate(15, -15)"); // Offset to top right
+
+    // Background rectangle for the badge
+    orderBadge.append("rect")
+        .attr("width", 22)
+        .attr("height", 14)
+        .attr("rx", 3) // Rounded corners
+        .attr("fill", d => d.data.highlight === "swap" ? "orange" : "#666") // Match swap color
+        .attr("x", -11)
+        .attr("y", -7);
+
+    // Text for the order number
+    orderBadge.append("text")
+        .text(d => d.data.order)
+        .attr("text-anchor", "middle")
+        .attr("dy", "0.3em")
+        .style("fill", "white")
+        .style("font-size", "10px")
+        .style("font-weight", "bold");
 }
