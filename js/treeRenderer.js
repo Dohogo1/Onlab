@@ -112,8 +112,7 @@ export function renderTree(rootNode, containerSelector = "#tree") {
         .attr("dy", "0.31em")
         .attr("text-anchor", "middle")
         .text(d => d.data.freq != null ? formatFreq(d.data.freq) : "")
-        .style("font-size", "12px")
-        .style("font-weight", "bold");
+        .style("font-size", "12px");
 
     // Add text 
     node.filter(d => !d.children) // Only target leaves
@@ -126,7 +125,8 @@ export function renderTree(rootNode, containerSelector = "#tree") {
             return `${d.data.char}`; // Wrap the character in quotes for clarity
         })
         .style("font-size", "13px")
-        .style("fill", "#222");
+        .style("fill", "#222")
+        .style("font-weight", "bold");
 
     const orderBadge = node.filter(d => d.data.order !== undefined)
         .append("g")
@@ -147,6 +147,5 @@ export function renderTree(rootNode, containerSelector = "#tree") {
         .attr("text-anchor", "middle")
         .attr("dy", "0.3em")
         .style("fill", "white")
-        .style("font-size", "10px")
-        .style("font-weight", "bold");
+        .style("font-size", "10px");
 }
