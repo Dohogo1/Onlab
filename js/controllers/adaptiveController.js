@@ -3,7 +3,7 @@ import { renderTree } from '../treeRenderer.js';
 
 export function initAdaptiveHuffman(container) {
     container.innerHTML = `
-        <h1>Adaptive Huffman Coding (FGK)</h1>
+        <h1>Adaptive Huffman Coding</h1>
         
         <div class="control-panel" style="background: #f4f4f4; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; gap: 15px; align-items: center;">
             <input type="text" id="init-text" placeholder="Initial string..." style="padding: 5px;">
@@ -13,13 +13,15 @@ export function initAdaptiveHuffman(container) {
             <button id="append-btn" disabled>Append</button>
         </div>
 
-        <div id="step-controls" style="display: flex; gap: 15px; align-items: center; margin-bottom: 20px; background: #eef; padding: 10px; border-radius: 8px; display: none;">
-            <button id="prev-btn" style="font-weight: bold; width: 40px;">&lt;</button>
-            <span id="step-counter" style="font-weight: bold;">Step: 0 / 0</span>
-            <button id="next-btn" style="font-weight: bold; width: 40px;">&gt;</button>
+        <div id="step-controls" style="display: flex; gap: 5px; align-items: center; margin-bottom: 20px; background: #eef; padding: 10px; border-radius: 8px; display: none;">
+            <button id="first-btn" style="font-weight: bold; width: 30px;">&lt;&lt;</button>
+            <button id="prev-btn" style="font-weight: bold; width: 30px;">&lt;</button>
+            <span id="step-counter" style="font-weight: bold; margin: 0 10px;">Step: 0 / 0</span>
+            <button id="next-btn" style="font-weight: bold; width: 30px;">&gt;</button>
+            <button id="last-btn" style="font-weight: bold; width: 30px;">&gt;&gt;</button>
             <div style="margin-left: 20px;">
                 <strong>Char:</strong> <span id="current-char" style="color: blue;">-</span> | 
-                <strong>Encoded:</strong> <span id="current-output" style="font-family: monospace; color: green;">-</span>
+                <strong>Encoded:</strong> <span id="current-output" style="color: green;">-</span>
             </div>
         </div>
 
@@ -61,7 +63,8 @@ export function initAdaptiveHuffman(container) {
         
         stepCounter.textContent = `Step: ${currentStep} / ${encoder.snapshots.length - 1}`;
         charDisplay.textContent = snap.char;
-        outputDisplay.textContent = snap.fullOutput || "0";
+        const fullText = container.querySelector("#init-text").value;
+        outputDisplay.textContent = currentStep === 0 ? "-" : fullText.substring(0, currentStep);
 
         container.querySelector("#prev-btn").disabled = currentStep === 0;
         container.querySelector("#next-btn").disabled = currentStep === encoder.snapshots.length - 1;
@@ -70,10 +73,10 @@ export function initAdaptiveHuffman(container) {
         renderTree(snap.root, "#tree-area"); // Update the tree
     };
 
-    // ... (rest of your event listeners for start-btn, append-btn, prev, and next)
     container.querySelector("#start-btn").addEventListener("click", () => {
         const text = container.querySelector("#init-text").value;
         if (!text) return;
+        container.querySelector("#start-btn").disabled = true;
         encoder = new AdaptiveHuffman();
         encoder.encode(text);
         currentStep = 0;
@@ -88,6 +91,15 @@ export function initAdaptiveHuffman(container) {
         if (!text || !encoder) return;
         encoder.encode(text);
         container.querySelector("#append-text").value = "";
+        container.querySelector("#init-text").value += text;
+        renderStep();
+    });
+
+    container.querySelector("#first-btn").addEventListener("click", () => {
+        currentStep = 0;
+        renderStep();
+    });
+    container.querySelector("#last-btn").addEventListener("click", () => {
         currentStep = encoder.snapshots.length - 1;
         renderStep();
     });

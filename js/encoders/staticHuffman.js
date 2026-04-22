@@ -1,5 +1,17 @@
-import BiNode from "../biNode.js";
-
+/**
+ * Class representing a node in a binary tree
+ */
+class BiNode {
+    constructor(char, freq) {
+        this.char = char;
+        this.freq = freq;
+        this.left = null;
+        this.right = null;
+    }
+    isLeaf() {
+        return !this.left && !this.right;
+    }
+}
 export default class StaticHuffman {
     constructor(table) {
         this.table = table;
