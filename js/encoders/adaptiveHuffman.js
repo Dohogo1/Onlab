@@ -125,17 +125,17 @@ export default class AdaptiveHuffman {
 
     findMaxVitterNode(targetNode) {
         let maxNode = null;
-        let isTargetLeaf = targetNode.isLeaf();
 
         for (let n of this.nodes) {
-            // Vitter's Rule: Must be same weight AND same type (leaf vs internal)
-            if (n.weight === targetNode.weight && n.isLeaf() === isTargetLeaf) {
+            // Standard Rule: Must be the SAME WEIGHT. 
+            // We remove the strict type check so internal nodes can swap with leaves.
+            if (n.weight === targetNode.weight) {
                 if (!maxNode || n.order > maxNode.order) {
                     maxNode = n;
                 }
             }
         }
-        return maxNode || targetNode; // Fallback to itself if no other nodes in block
+        return maxNode || targetNode; 
     }
 
     getPath(node) {
