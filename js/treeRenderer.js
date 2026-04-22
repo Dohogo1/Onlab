@@ -16,13 +16,13 @@ export function renderTree(rootNode, containerSelector = "#tree") {
     });
 
     // 3. Calculate Dynamic Dimensions
-    const width = 450;
+    const width = root.height > 4 ? 1000 : 600; // Wider for deeper trees
     const margin = { top: 40, right: 0, bottom: 60, left: 0 };
     
     // root.height gives the maximum depth of the tree. 
     // We give each level 70 pixels of breathing room, with a minimum height of 300.
     const levelSpacing = 70; 
-    const dynamicHeight = Math.max(300, (root.height * levelSpacing) + margin.top + margin.bottom);
+    const dynamicHeight = (root.height * levelSpacing) + margin.top + margin.bottom;
 
     // Append SVG with the new dynamic height
     const svg = container 
