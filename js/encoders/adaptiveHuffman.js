@@ -20,7 +20,7 @@ export default class AdaptiveHuffman {
     constructor() {
         this.root = new AdaptiveNode("NYT", 0, 512);
         this.nyt = this.root;
-        this.nodes = [this.root]; // Keep track of all nodes to easily find max ordered in weight class
+        this.nodes = [this.root]; 
         this.seen = new Map();
         
         // History for step-by-step visualization
@@ -44,9 +44,9 @@ export default class AdaptiveHuffman {
         let currNode;
         this.clearHighlights(this.root);
 
-        // 1. Seen this symbol before?
+        // Seen this symbol before?
         if (!this.seen.has(char)) {
-            // NO: Get code for NYT, then output raw character
+            // Get code for NYT, then output raw character
             code = this.getPath(this.nyt) + char;
             this.currentOutput += code;
 
@@ -55,7 +55,7 @@ export default class AdaptiveHuffman {
             const newNyt = new AdaptiveNode("NYT", 0, oldNyt.order - 2);
             const newCharNode = new AdaptiveNode(char, 0, oldNyt.order - 1);
             
-            oldNyt.char = null; // Becomes internal node
+            oldNyt.char = null; 
             oldNyt.left = newNyt;
             oldNyt.right = newCharNode;
             newNyt.parent = oldNyt;
@@ -101,25 +101,25 @@ export default class AdaptiveHuffman {
             currNode = currNode.parent;
         }
 
-        // 3. Collect current weights for the table snapshot
+        // Collect current weights for the table snapshot
         const currentWeights = [];
         this.seen.forEach((node, char) => {
             currentWeights.push({ 
                 char: char, 
-                freq: node.weight // Using 'freq' so it matches your table styles
+                freq: node.weight 
             });
         });
         
-        // Optional: Sort so the table stays consistent (e.g., Alphabetical or by Weight)
+        // Sort so the table stays consistent 
         currentWeights.sort((a, b) => a.char.localeCompare(b.char));
 
-        // 4. Save state snapshot including the new weights array
+        // Save state snapshot including the new weights array
         this.snapshots.push({
             char: char,
             code: code,
             fullOutput: this.currentOutput,
             root: this.cloneTree(this.root),
-            weights: currentWeights // <--- This is what the controller will read
+            weights: currentWeights 
         });
     }
 
@@ -127,8 +127,7 @@ export default class AdaptiveHuffman {
         let maxNode = null;
 
         for (let n of this.nodes) {
-            // Standard Rule: Must be the SAME WEIGHT. 
-            // We remove the strict type check so internal nodes can swap with leaves.
+            // remove the strict type check so internal nodes can swap with leaves.
             if (n.weight === targetNode.weight) {
                 if (!maxNode || n.order > maxNode.order) {
                     maxNode = n;

@@ -1,6 +1,3 @@
-/**
- * Class representing a node in a binary tree
- */
 class BiNode {
     constructor(char, freq) {
         this.char = char;
@@ -24,24 +21,19 @@ export default class StaticHuffman {
             ([char, freq]) => new BiNode(char, freq)
         );
 
-        this.explore(forest, []);
+        this.explore(forest,);
         if (!showAll) {
             this.filterUniqueShapes();
         }
     }
 
-    explore(forest, steps) {
+    explore(forest) {
         forest = this.cloneForest(forest);
-
-        // record current state
-        const stepRoot = this.createVisualizationRoot(forest);
-        const newSteps = [...steps, { root: stepRoot }];
 
         //stop, if the tree is finished
         if (forest.length === 1) {
             this.solutions.push({
-                root: forest[0],
-                steps: newSteps
+                root: forest[0]
             });
             return;
         }
@@ -113,29 +105,14 @@ export default class StaticHuffman {
 
             newForest.push(parent);
 
-            this.explore(newForest, newSteps);
+            this.explore(newForest);
         }
     }
-    
-    createVisualizationRoot(forest) {
-        if (forest.length === 1) {
-            return this.cloneNode(forest[0]);
-        }
-        return {
-            children: forest.map(n => this.cloneNode(n))
-        };
-    }
-
     
     cloneForest(forest) {
         return forest.map(n => this.cloneNode(n));
     }
 
-    /**
-     * Clones a given node of the tree
-     * @param {*} node the node to be cloned
-     * @returns new node with the same character, frequency and parents
-     */
     cloneNode(node) {
         if (!node) return null;
 

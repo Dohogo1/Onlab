@@ -39,8 +39,8 @@ export function initStaticHuffman(container) {
             }
         });
 
-        if (Math.abs(totalProb - 1) > 0.0001) {
-            treeArea.innerHTML = `<p style="color:red">Frequencies must sum to 1 (Current: ${totalProb.toFixed(2)})</p>`;
+        if (Math.abs(totalProb - 1) > 0.00001) {
+            treeArea.innerHTML = `<p style="color:red">Frequencies must sum to 1 (Current: ${totalProb.toFixed(4)})</p>`;
             return;
         }
 

@@ -20,9 +20,10 @@ export function initAdaptiveHuffman(container) {
             <span id="step-counter" style="font-weight: bold; margin: 0 10px;">Step: 0 / 0</span>
             <button id="next-btn" style="font-weight: bold; width: 30px;">&gt;</button>
             <button id="last-btn" style="font-weight: bold; width: 30px;">&gt;&gt;</button>
-            <div style="margin-left: 20px;">
+            <div style="margin-left: 20px; font-size: 14px;">
                 <strong>Char:</strong> <span id="current-char" style="color: blue;">-</span> | 
-                <strong>Encoded:</strong> <span id="current-output" style="color: green;">-</span>
+                <strong>Processed Text:</strong> <span id="processed-text" style="color: #666;">-</span> | 
+                <strong>Encoded Binary:</strong> <span id="current-output" style="color: green; font-family: monospace;">-</span>
             </div>
         </div>
 
@@ -64,8 +65,11 @@ export function initAdaptiveHuffman(container) {
         
         stepCounter.textContent = `Step: ${currentStep} / ${encoder.snapshots.length - 1}`;
         charDisplay.textContent = snap.char;
+
         const fullText = container.querySelector("#init-text").value;
-        outputDisplay.textContent = currentStep === 0 ? "-" : fullText.substring(0, currentStep);
+        container.querySelector("#processed-text").textContent = currentStep === 0 ? "-" : fullText.substring(0, currentStep);
+
+        outputDisplay.textContent = currentStep === 0 ? "-" : snap.fullOutput;
 
         container.querySelector("#prev-btn").disabled = currentStep === 0;
         container.querySelector("#next-btn").disabled = currentStep === encoder.snapshots.length - 1;

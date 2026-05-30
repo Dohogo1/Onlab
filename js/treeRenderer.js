@@ -6,8 +6,8 @@ export function renderTree(rootNode, containerSelector = "#tree") {
     const container = d3.select(containerSelector);
     container.selectAll("*").remove();
 
-    // 2. Convert your binary node to a D3 Hierarchy FIRST
-    // We do this first so we can find out how deep the tree is!
+    // 2. Convert your binary node to a D3 Hierarchy
+    // We do this first so we can find out how deep the tree is
     const root = d3.hierarchy(rootNode, d => {
         const children = [];
         if (d.left) children.push(d.left);
